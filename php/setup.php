@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 session_start();
 require_once __DIR__ . '/api/bootstrap.php';
+require_once __DIR__ . '/apps/load.php';
+$profile = xstore_profile();
 
 $flash = null;
 $error = null;
@@ -21,7 +23,7 @@ try {
 }
 
 $adminKey = defined('ADMIN_KEY') ? (string)ADMIN_KEY : (defined('API_KEY') ? (string)API_KEY : '');
-$appName = defined('APP_NAME') ? APP_NAME : 'Fuwari REC Remote';
+$appName = defined('APP_NAME') ? APP_NAME : (string)$profile['name'];
 
 // logout
 if (isset($_GET['logout'])) {
@@ -193,10 +195,10 @@ function h(?string $s): string {
   <div class="max-w-4xl mx-auto px-4 py-10">
     <header class="mb-8 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <p class="text-xs text-emerald-300/60">Fuwari REC Remote</p>
+        <p class="text-xs text-emerald-300/60"><?= h((string)$profile['id']) ?> · external store</p>
         <h1 class="text-2xl font-bold tracking-tight">セットアップ & 接続監視</h1>
         <p class="mt-1 text-sm text-emerald-200/70">
-          Fuwari からの接続をログし、接続元 IP だけで <code class="text-emerald-200">proxy.php</code> を守る .htaccess を書けます。
+          クライアントからの接続をログし、接続元 IP だけで <code class="text-emerald-200">proxy.php</code> を守る .htaccess を書けます。
         </p>
       </div>
       <?php if ($authed): ?>
@@ -240,10 +242,10 @@ function h(?string $s): string {
       <!-- connection howto -->
       <section class="mb-6 rounded-3xl border border-emerald-700/40 bg-emerald-900/40 p-5">
         <h2 class="font-semibold flex items-center gap-2">
-          <i class="fa-solid fa-plug text-emerald-400"></i> Fuwari からの接続確認
+          <i class="fa-solid fa-plug text-emerald-400"></i> クライアントからの接続確認
         </h2>
         <ol class="mt-3 list-decimal pl-5 space-y-1 text-sm text-emerald-100/80">
-          <li>Fuwari REC → <strong>リモート保存</strong> タブ</li>
+          <li><?= h((string)$profile['setup_hint']) ?></li>
           <li>プロキシ URL に下の URL を貼る</li>
           <li>API キーを貼り「接続テスト」</li>
           <li>成功すると下の「接続ログ」に <code>ping</code> が溜まる → 接続元 IP が分かる</li>
@@ -252,7 +254,7 @@ function h(?string $s): string {
           <span class="text-emerald-400/70">proxy URL · </span><?= h($proxyUrl) ?>
         </div>
         <p class="mt-2 text-[11px] text-emerald-200/50">
-          IP 制限を ON にする前に、必ず自分の IP を許可リストへ入れてください（入れないと Fuwari も拒否されます）。
+          IP 制限を ON にする前に、必ず自分の IP を許可リストへ入れてください（入れないとクライアントも拒否されます）。
         </p>
       </section>
 
@@ -267,7 +269,7 @@ function h(?string $s): string {
               </thead>
               <tbody>
               <?php if (!$ips): ?>
-                <tr><td colspan="4" class="py-6 text-center text-emerald-200/50">まだ接続がありません。Fuwari から接続テストしてください。</td></tr>
+                <tr><td colspan="4" class="py-6 text-center text-emerald-200/50">まだ接続がありません。クライアントから接続確認してください。</td></tr>
               <?php endif; ?>
               <?php foreach ($ips as $row): ?>
                 <tr class="border-t border-emerald-800/60">
@@ -385,7 +387,7 @@ function h(?string $s): string {
             </thead>
             <tbody>
             <?php if (!$logs): ?>
-              <tr><td colspan="6" class="py-8 text-center text-emerald-200/50">ログなし — Fuwari で接続テストするとここに出ます</td></tr>
+              <tr><td colspan="6" class="py-8 text-center text-emerald-200/50">ログなし — クライアントで接続確認するとここに出ます</td></tr>
             <?php endif; ?>
             <?php foreach ($logs as $log): ?>
               <tr class="border-t border-emerald-800/50">

@@ -1,6 +1,6 @@
 <?php
 /**
- * Fuwari REC — HTTPS JSON front for MySQL
+ * External store — HTTPS JSON front for MySQL
  *
  * POST JSON actions:
  *   ping | whoami
@@ -78,7 +78,7 @@ if ($basicUser !== '') {
         }
     }
     if (!hash_equals($basicUser, (string)$u) || !hash_equals($basicPass, (string)$pw)) {
-        header('WWW-Authenticate: Basic realm="Fuwari Proxy"');
+        header('WWW-Authenticate: Basic realm="External Store"');
         fail(401, 'Basic 認証が必要です');
     }
 }
@@ -148,7 +148,8 @@ try {
             fuwari_log_access($pdo, $action, true, 200, $nsForLog, 'connection check');
             respond(200, [
                 'ok' => true,
-                'service' => defined('APP_NAME') ? APP_NAME : 'fuwari-remote',
+                'service' => defined('APP_NAME') ? APP_NAME : 'external-store',
+                'app_id' => defined('APP_ID') ? APP_ID : null,
                 'version' => defined('APP_VERSION') ? APP_VERSION : null,
                 'time' => gmdate('c'),
                 'client_ip' => $clientIp,

@@ -5,9 +5,13 @@
 // =============================================
 header('Content-Type: text/html; charset=utf-8');
 
-$APP_NAME    = 'Fuwari REC Remote';
-$APP_VERSION = 'v1.0';
-$APP_EDITION = 'Proxy';
+require_once __DIR__ . '/apps/load.php';
+$profile = xstore_profile();
+
+$APP_ID      = $profile['id'];
+$APP_NAME    = $profile['name'];
+$APP_VERSION = $profile['version'];
+$APP_EDITION = $profile['edition'];
 $SHOW_APP_INFO = true;
 $SHOW_APP_INFO_INPUT = true;
 
@@ -71,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($conn->multi_query($sql)) {
                         while ($conn->more_results() && $conn->next_result()) { /* drain */ }
 
-                        $appName    = $post_app_name    ?: 'Fuwari REC Remote';
+                        $appName    = $post_app_name    ?: $APP_NAME;
                         $appVersion = $post_app_version ?: 'v1.0';
                         $appEdition = $post_app_edition ?: 'Proxy';
                         $esc = static function (string $s): string {
@@ -91,7 +95,7 @@ PHP;
                         $config_content = <<<PHP
 <?php
 // =============================================
-// Fuwari REC Remote - Database Config
+// External store - Database Config
 // Written by install.php
 // =============================================
 
@@ -106,6 +110,7 @@ define('DB_OPTIONS', [
     PDO::ATTR_EMULATE_PREPARES   => false,
 ]);
 
+define('APP_ID',      '{$esc($APP_ID)}');
 define('APP_NAME',    '{$esc($appName)}');
 define('APP_VERSION', '{$esc($appVersion)}');
 define('APP_EDITION', '{$esc($appEdition)}');
@@ -181,7 +186,7 @@ PHP;
                     <div class="font-semibold text-center">インストール完了</div>
                     <p>テーブルを作成し、<code class="text-emerald-200">api/config.php</code> を更新しました。</p>
                     <div class="rounded-xl bg-emerald-950/50 p-3 break-all">
-                        <div class="text-[11px] text-emerald-300/70 mb-1">Fuwari REC に貼る API キー</div>
+                        <div class="text-[11px] text-emerald-300/70 mb-1">クライアントに貼る API キー</div>
                         <code class="text-emerald-100 text-xs"><?= htmlspecialchars($apiKeyHint) ?></code>
                     </div>
                     <div class="rounded-xl bg-emerald-950/50 p-3 break-all">
@@ -196,7 +201,7 @@ PHP;
                         </code>
                     </div>
                     <p class="text-[11px] text-emerald-200/60">
-                        install.php は install.php.txt に改名済みです。CORS に Fuwari の Origin を足す場合は config.php を編集してください。
+                        install.php は install.php.txt に改名済みです。CORS にフロントの Origin を足す場合は config.php を編集してください。
                     </p>
                     <a href="setup.php" class="block text-center mt-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white">接続監視セットアップを開く</a>
                     <a href="index.html" class="block text-center mt-2 text-emerald-300 underline text-sm">ステータスページへ</a>

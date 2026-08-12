@@ -1,0 +1,9 @@
+{
+  "name": "@xstore/app-fuwari",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fuwari REC adapter on @xstore/core-client",
+  "type": "module",
+  "exports": { ".": "./index.ts" },
+  "license": "MIT"
+}

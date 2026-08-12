@@ -1,46 +1,45 @@
-# Fuwari External Storage
+# xstore — Vercel 外部ストレージ（共通骨格）
 
-**Vercel に載った Fuwari REC から、自分の MySQL へ設定を出すための外部ストレージ計画**です。
+Vercel などディスクのないフロントから、**ユーザーの MySQL** へ JSON だけ出すための共通構造です。
 
-Vercel のフロントはエフェメラルです。音声バッファはブラウザ内、設定・声域結果・スナップショットだけを **HTTPS JSON プロキシ** 経由でレンタルサーバー上の MySQL に置きます。生 SQL はブラウザに出しません。
+アプリ固有の型（Fuwari の MIX など）はコアに入れません。  
+**コア + アプリプロファイル** の二層です。
 
 ```
-[ Fuwari REC on Vercel ]
-        │  POST JSON + X-Api-Key (+ optional Basic)
+[ Any app on Vercel ]
+        │  POST JSON + X-Api-Key
         ▼
-[ php/api/proxy.php ]  ← このリポジトリを HTTPS ホストへ
-        │  PDO プリペアドのみ
+[ php/api/proxy.php ]     ← 共通
+        │
         ▼
-[ MySQL : kv_store / snapshots / access_log ]
+[ MySQL kv / snapshots / log ]
+   namespace = {appId}.{tenant}
 ```
 
-## このリポジトリの中身
+## 層
 
-| パス | 役割 |
-|------|------|
-| [`docs/PLAN.md`](docs/PLAN.md) | なぜ外部ストレージか・何を保存しないか |
-| [`docs/API.md`](docs/API.md) | `proxy.php` の action 仕様 |
-| [`docs/VERCEL.md`](docs/VERCEL.md) | Vercel アプリからのつなぎ方 |
-| [`docs/SECURITY.md`](docs/SECURITY.md) | API キー / Basic / IP 制限 |
-| [`php/`](php/) | **デプロイ用** php_installer 互換パッケージ |
-| [`packages/browser-client/`](packages/browser-client/) | Fuwari と同じ TypeScript クライアント |
+| 層 | パス | 中身 |
+|----|------|------|
+| **コア PHP** | [`php/`](php/) | install / proxy / setup。action は共通 |
+| **アプリ PHP** | [`php/apps/`](php/apps/) | 名前・CORS・接頭辞。`active.php` で選択 |
+| **コア TS** | [`packages/core-client/`](packages/core-client/) | ping / kv / snap / ログ |
+| **アプリ TS** | [`packages/apps/{id}/`](packages/apps/) | そのアプリの設定 JSON 型 |
 
-## 最短セットアップ
+Fuwari REC は **実装例** です（`php/apps/fuwari.php` + `packages/apps/fuwari`）。
 
-1. [`php/`](php/) フォルダごとレンタルサーバーへ（**必ず HTTPS**）
-2. ブラウザで `…/install.php` → MySQL 接続 → テーブル作成 → `config.php` 書き込み（自己改名）
-3. 表示された **proxy URL** と **API キー** を控える
-4. Fuwari REC → **リモート管理** に貼って **接続確認**
-5. サーバー `setup.php` で接続元 IP を見て、必要なら許可リスト → `.htaccess` 書込
+## ドキュメント
 
-## 保存するもの / しないもの
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — なぜこう切るか
+- [docs/ADDING_AN_APP.md](docs/ADDING_AN_APP.md) — アプリの足し方
+- [docs/API.md](docs/API.md) — action 一覧
+- [docs/SECURITY.md](docs/SECURITY.md)
+- [docs/VERCEL.md](docs/VERCEL.md)
 
-| する | しない |
-|------|--------|
-| MIX プリセット・音量・ピッチ | 録音 WAV / 動画本体 |
-| BPM・声域測定結果 | YouTube の音声キャッシュ |
-| 名前付き設定スナップショット | 生 SQL・DB パスワード |
+## 最短
 
-## ライセンス
+1. `php/` を HTTPS ホストへ
+2. `php/apps/active.php` が欲しいアプリを指しているか確認
+3. `install.php` → クライアントに URL / API キー
+4. フロントは `createConfigStore({ appId: "fuwari" })`
 
-MIT。インストーラ骨格は [php_installer](https://x.com/mss_0337_2024) 互換です。
+同じ MySQL に別アプリを足すときはプロファイルを追加するだけ。テーブルは増やしません。
