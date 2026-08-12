@@ -8,12 +8,23 @@ function fuwari_config_path(): string {
     return __DIR__ . '/config.php';
 }
 
+function fuwari_secrets_path(): string {
+    return __DIR__ . '/secrets.local.php';
+}
+
 function fuwari_load_config(): void {
     $path = fuwari_config_path();
     if (!is_file($path)) {
         throw new RuntimeException('api/config.php がありません。install.php を実行してください。');
     }
     require_once $path;
+    $secrets = fuwari_secrets_path();
+    if (is_file($secrets)) {
+        require_once $secrets;
+    }
+    if (!defined('API_KEY') || API_KEY === '' || !defined('DB_NAME') || DB_NAME === '') {
+        throw new RuntimeException('api/secrets.local.php が未設定です。install.php で動的に書き出してください（ソースには鍵を書きません）。');
+    }
 }
 
 function fuwari_client_ip(): string {
@@ -120,6 +131,26 @@ function fuwari_build_proxy_htaccess(array $ips, bool $enforce): string {
     </IfModule>
 </Files>
 
+<Files "secrets.local.php">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</Files>
+
+<Files "secrets.sample.php">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</Files>
+
 HTA;
 
     if (!$enforce) {
@@ -173,3 +204,32 @@ function fuwari_write_api_htaccess(string $content): bool {
     $path = __DIR__ . '/.htaccess';
     return file_put_contents($path, $content) !== false;
 }
+
+/** Rewrite secrets.local.php (never commit). Preserves existing DB_* unless overridden. */
+function fuwari_write_secrets(array $over): bool {
+    $esc = static function (string $s): string {
+        return str_replace(["\\", "'"], ["\\\\", "\\'"], $s);
+    };
+    $get = static function (string $key, string $fallback = '') use ($over): string {
+        if (array_key_exists($key, $over)) {
+            return (string)$over[$key];
+        }
+        return defined($key) ? (string)constant($key) : $fallback;
+    };
+    $body = "<?php\n// GENERATED — do not commit. Written by install/setup.\n"
+        . "define('DB_HOST', '" . $esc($get('DB_HOST', 'localhost')) . "');\n"
+        . "define('DB_USER', '" . $esc($get('DB_USER')) . "');\n"
+        . "define('DB_PASS', '" . $esc($get('DB_PASS')) . "');\n"
+        . "define('DB_NAME', '" . $esc($get('DB_NAME')) . "');\n"
+        . "define('API_KEY', '" . $esc($get('API_KEY')) . "');\n"
+        . "define('ADMIN_KEY', '" . $esc($get('ADMIN_KEY', $get('API_KEY'))) . "');\n"
+        . "define('BASIC_AUTH_USER', '" . $esc($get('BASIC_AUTH_USER')) . "');\n"
+        . "define('BASIC_AUTH_PASS', '" . $esc($get('BASIC_AUTH_PASS')) . "');\n";
+    $path = fuwari_secrets_path();
+    $ok = file_put_contents($path, $body) !== false;
+    if ($ok) {
+        @chmod($path, 0600);
+    }
+    return $ok;
+}
+

@@ -93,6 +93,30 @@ if ($authed && $pdo) {
             }
         }
 
+        if ($form === 'rotate_secrets') {
+            $newKey = trim((string)($_POST['api_key'] ?? ''));
+            if ($newKey === '') {
+                try {
+                    $newKey = bin2hex(random_bytes(24));
+                } catch (Throwable $e) {
+                    $newKey = bin2hex((string)openssl_random_pseudo_bytes(24));
+                }
+            }
+            $basicUser = trim((string)($_POST['basic_user'] ?? ''));
+            $basicPass = (string)($_POST['basic_pass'] ?? '');
+            $adminKeyNew = trim((string)($_POST['admin_key_new'] ?? ''));
+            if (fuwari_write_secrets([
+                'API_KEY' => $newKey,
+                'ADMIN_KEY' => $adminKeyNew !== '' ? $adminKeyNew : $newKey,
+                'BASIC_AUTH_USER' => $basicUser,
+                'BASIC_AUTH_PASS' => $basicPass,
+            ])) {
+                $flash = ['type' => 'ok', 'msg' => 'secrets.local.php を更新しました（ソースには書きません）。新しい API キーを Hobby 管理画面へ。'];
+            } else {
+                $flash = ['type' => 'err', 'msg' => 'secrets.local.php を書けませんでした'];
+            }
+        }
+
         if ($form === 'remove_ip') {
             $id = (int)($_POST['id'] ?? 0);
             $pdo->prepare('DELETE FROM ip_allowlist WHERE id = ?')->execute([$id]);
@@ -256,6 +280,31 @@ function h(?string $s): string {
         <p class="mt-2 text-[11px] text-emerald-200/50">
           IP 制限を ON にする前に、必ず自分の IP を許可リストへ入れてください（入れないとクライアントも拒否されます）。
         </p>
+      </section>
+
+      <section class="mb-6 rounded-3xl border border-emerald-700/40 bg-emerald-900/40 p-5">
+        <h2 class="font-semibold">接続秘密鍵（secrets.local.php）</h2>
+        <p class="mt-1 text-xs text-emerald-200/60">
+          ソースには書きません。install / この画面が動的に生成します。
+        </p>
+        <form method="post" class="mt-3 grid gap-2 sm:grid-cols-2">
+          <input type="hidden" name="form" value="rotate_secrets" />
+          <label class="text-[11px] text-emerald-300/70">API キー（空なら再発行）
+            <input name="api_key" class="mt-1 w-full rounded-xl border border-emerald-700 bg-emerald-950/60 px-3 py-2 text-sm" placeholder="空で新規ランダム" />
+          </label>
+          <label class="text-[11px] text-emerald-300/70">ADMIN キー（空なら API キーと同じ）
+            <input name="admin_key_new" class="mt-1 w-full rounded-xl border border-emerald-700 bg-emerald-950/60 px-3 py-2 text-sm" />
+          </label>
+          <label class="text-[11px] text-emerald-300/70">Basic ユーザー
+            <input name="basic_user" value="<?= h(defined('BASIC_AUTH_USER') ? (string)BASIC_AUTH_USER : '') ?>" class="mt-1 w-full rounded-xl border border-emerald-700 bg-emerald-950/60 px-3 py-2 text-sm" />
+          </label>
+          <label class="text-[11px] text-emerald-300/70">Basic パスワード
+            <input type="password" name="basic_pass" class="mt-1 w-full rounded-xl border border-emerald-700 bg-emerald-950/60 px-3 py-2 text-sm" placeholder="変更するときだけ" />
+          </label>
+          <div class="sm:col-span-2">
+            <button class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold">secrets.local.php を更新</button>
+          </div>
+        </form>
       </section>
 
       <div class="grid gap-6 lg:grid-cols-2">
