@@ -1,48 +1,25 @@
-# アーキテクチャ（Grok Build 共通）
+# アーキテクチャ
 
-Grok Build アプリはだいたい Vercel に載る。永続 MySQL はホスト側に無い。  
-設定・測定結果・スナップショットだけ、ユーザーのレンタルサーバーへ出す。それがこのキット。
-
-## 切り方
+## 二段構え
 
 ```
-                 ┌─ php/apps/fuwari.php      （例）
-   php/ ─────────┤
-   (共通プロキシ) └─ php/apps/myapp.php      ← 新しい Grok Build アプリ
-                 ┌─ packages/apps/fuwari
-   core-client ──┤
-   (共通 fetch)  └─ packages/apps/myapp
+ Hobby 内（小さく）          Hobby を超える分
+ ┌─────────────────┐        ┌──────────────────────┐
+ │ Vercel + Neon   │        │ ユーザー MySQL       │
+ │ 設定・認証・少量 │   →    │ grokbuild-external-  │
+ │ Blob も少し     │        │ storage (このキット) │
+ └─────────────────┘        └──────────────────────┘
 ```
 
-**共通:** 認証、CORS、KV、スナップショット、接続ログ、IP .htaccess  
-**アプリ:** 表示名、許可 Origin、namespace 接頭辞、保存する JSON の形
+左を「無い」とは言わない。右は **超えた人向けの拡張**。
 
-## データの分かれ方
-
-テーブルは増やさない。namespace で切る。
+## コアとアプリ
 
 ```
-fuwari.default
-myapp.alice
-another.default
+php/api/proxy.php     共通（KV / snap / ログ / 認証）
+php/apps/{id}.php     アプリの顔（CORS・名前）
+core-client           どの Grok Build アプリでも同じ fetch
+packages/apps/{id}    そのアプリの JSON 型
 ```
 
-`composeNamespace(appId, tenant)` が付与。  
-`setup.php` のタイトルだけ `apps/active.php`（そのホストの「顔」）。
-
-## フロント
-
-```ts
-import { createConfigStore, remoteKvSet } from "@grokbuild/external-storage";
-
-const store = createConfigStore({ appId: "myapp" });
-await remoteKvSet(store.load(), "settings.latest", payload);
-```
-
-## デプロイ単位
-
-| 何を配るか | どこへ |
-|------------|--------|
-| `php/` 一式 | ユーザーのレンタルサーバー |
-| フロント SPA | Vercel（Grok Build の成果物） |
-| このリポジトリ | キットの正本 |
+namespace は `{appId}.{tenant}`。テーブルは増やさない。
