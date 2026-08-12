@@ -1,8 +1,5 @@
-# never commit real credentials
-php/api/.ip_enforce
-php/install.php.txt
-
-# local noise
+php-api/api/.ip_enforce
+php-api/install.php.txt
 .DS_Store
 node_modules/
 dist/

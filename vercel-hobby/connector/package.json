@@ -1,0 +1,9 @@
+{
+  "name": "@grokbuild/external-storage-connector",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vercel Hobby side — browser connector to the legacy PHP API",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "license": "MIT"
+}

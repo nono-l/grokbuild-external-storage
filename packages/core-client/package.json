@@ -1,9 +1,0 @@
-{
-  "name": "@grokbuild/external-storage",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Grok Build — app-agnostic browser client for the HTTPS MySQL proxy",
-  "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "license": "MIT"
-}

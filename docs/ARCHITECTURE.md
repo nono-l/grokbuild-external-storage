@@ -1,25 +1,17 @@
-# アーキテクチャ
-
-## 二段構え
+# アーキテクチャ — 二つの半分
 
 ```
- Hobby 内（小さく）          Hobby を超える分
- ┌─────────────────┐        ┌──────────────────────┐
- │ Vercel + Neon   │        │ ユーザー MySQL       │
- │ 設定・認証・少量 │   →    │ grokbuild-external-  │
- │ Blob も少し     │        │ storage (このキット) │
- └─────────────────┘        └──────────────────────┘
+ Vercel Hobby アプリ                    レガシーレンタル
+ ┌──────────────────────┐              ┌──────────────────┐
+ │ Neon / Blob（小さく） │              │ MySQL            │
+ │                      │   JSON       │                  │
+ │ connector  ──────────┼─────────────►│ api/proxy.php    │
+ │ admin 管理画面       │              │ setup.php        │
+ └──────────────────────┘              └──────────────────┘
+        vercel-hobby/                         php-api/
 ```
 
-左を「無い」とは言わない。右は **超えた人向けの拡張**。
+1. **Hobby 連携** — アプリに組み込む。接続先の設定と確認 UI。  
+2. **PHP API** — 古い共用サーバーに置くだけ。生 SQL は受けない。
 
-## コアとアプリ
-
-```
-php/api/proxy.php     共通（KV / snap / ログ / 認証）
-php/apps/{id}.php     アプリの顔（CORS・名前）
-core-client           どの Grok Build アプリでも同じ fetch
-packages/apps/{id}    そのアプリの JSON 型
-```
-
-namespace は `{appId}.{tenant}`。テーブルは増やさない。
+namespace は `{appId}.{tenant}`。プロキシはアプリを知らない。
