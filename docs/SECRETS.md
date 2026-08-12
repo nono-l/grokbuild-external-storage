@@ -1,19 +1,17 @@
 # 秘密情報はソースに置かない
 
 ```
- Hobby / Neon                         レガシー PHP
- grokbuild_external_connector         api/secrets.local.php
-  (ユーザー単位・動的)                  (install / setup が動的生成)
-        ▲                                      ▲
-        │ ソース・git・localStorage には載せない │
+ Hobby / Neon                            レガシー PHP
+ grokbuild_external_connector            api/config.php
+  （ユーザー単位・動的）                   install.php / setup.php が動的に書く
+                                           （php_installer と同じ）
 ```
 
-| 場所 | 何を置く | 何を置かない |
-|------|----------|--------------|
-| git | スキーマ・サンプル | API キー、DB パスワード、Basic |
-| Neon | サインインユーザーの接続鍵 | アプリのソース |
-| `secrets.local.php` | DB / API_KEY / Basic | リポジトリ |
-| ブラウザ | メモリ上のフォーム | localStorage に鍵を残さない |
+| 場所 | 役割 |
+|------|------|
+| git の `config.php` | Sample だけ（`Sample` / `CHANGE_ME`） |
+| サーバ上の `config.php` | install が上書き。DB と API_KEY の本番値 |
+| Neon | Hobby アプリ側の接続先・鍵（ユーザー単位） |
 
-Hobby 管理画面はサインイン必須。未ログインでは Neon に書けません。
-PHP 側は `install.php` または `setup.php` が `secrets.local.php` を書き、`.htaccess` で直アクセス拒否。
+PHP API は **config.php を使う**。別ファイルに分けない。  
+`.htaccess` が `config.php` の直アクセスを拒否する。

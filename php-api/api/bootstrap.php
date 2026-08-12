@@ -8,22 +8,17 @@ function fuwari_config_path(): string {
     return __DIR__ . '/config.php';
 }
 
-function fuwari_secrets_path(): string {
-    return __DIR__ . '/secrets.local.php';
-}
-
 function fuwari_load_config(): void {
     $path = fuwari_config_path();
     if (!is_file($path)) {
         throw new RuntimeException('api/config.php がありません。install.php を実行してください。');
     }
     require_once $path;
-    $secrets = fuwari_secrets_path();
-    if (is_file($secrets)) {
-        require_once $secrets;
+    if (!defined('API_KEY') || API_KEY === '' || API_KEY === 'CHANGE_ME_LONG_RANDOM_API_KEY') {
+        throw new RuntimeException('config.php の API_KEY が未設定です。install.php で動的に書き出してください。');
     }
-    if (!defined('API_KEY') || API_KEY === '' || !defined('DB_NAME') || DB_NAME === '') {
-        throw new RuntimeException('api/secrets.local.php が未設定です。install.php で動的に書き出してください（ソースには鍵を書きません）。');
+    if (!defined('DB_NAME') || DB_NAME === '' || DB_NAME === 'Sample') {
+        throw new RuntimeException('config.php の DB が Sample のままです。install.php を実行してください。');
     }
 }
 
@@ -205,8 +200,8 @@ function fuwari_write_api_htaccess(string $content): bool {
     return file_put_contents($path, $content) !== false;
 }
 
-/** Rewrite secrets.local.php (never commit). Preserves existing DB_* unless overridden. */
-function fuwari_write_secrets(array $over): bool {
+/** Rewrite api/config.php (php_installer). Runtime file — not source. */
+function fuwari_write_config(array $over): bool {
     $esc = static function (string $s): string {
         return str_replace(["\\", "'"], ["\\\\", "\\'"], $s);
     };
@@ -216,20 +211,49 @@ function fuwari_write_secrets(array $over): bool {
         }
         return defined($key) ? (string)constant($key) : $fallback;
     };
-    $body = "<?php\n// GENERATED — do not commit. Written by install/setup.\n"
+    $cors = "define('CORS_ORIGINS', [\n    'http://localhost:8080',\n]);\n";
+    if (defined('CORS_ORIGINS') && is_array(CORS_ORIGINS)) {
+        $lines = [];
+        foreach (CORS_ORIGINS as $o) {
+            if (is_string($o) && $o !== '') {
+                $lines[] = "    '" . $esc($o) . "',";
+            }
+        }
+        if ($lines) {
+            $cors = "define('CORS_ORIGINS', [\n" . implode("\n", $lines) . "\n]);\n";
+        }
+    }
+    $trust = defined('TRUST_PROXY') && TRUST_PROXY ? 'true' : 'false';
+    $max = defined('MAX_BODY_BYTES') ? (string)(int)MAX_BODY_BYTES : (string)(512 * 1024);
+    $body = "<?php\n"
+        . "// Written by install.php / setup.php. リポジトリの Sample ではない。\n\n"
         . "define('DB_HOST', '" . $esc($get('DB_HOST', 'localhost')) . "');\n"
         . "define('DB_USER', '" . $esc($get('DB_USER')) . "');\n"
         . "define('DB_PASS', '" . $esc($get('DB_PASS')) . "');\n"
         . "define('DB_NAME', '" . $esc($get('DB_NAME')) . "');\n"
+        . "define('DB_CHARSET', 'utf8mb4');\n"
+        . "define('DB_OPTIONS', [\n"
+        . "    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,\n"
+        . "    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,\n"
+        . "    PDO::ATTR_EMULATE_PREPARES   => false,\n"
+        . "]);\n\n"
+        . "define('APP_ID',      '" . $esc($get('APP_ID', 'app')) . "');\n"
+        . "define('APP_NAME',    '" . $esc($get('APP_NAME', 'Application')) . "');\n"
+        . "define('APP_VERSION', '" . $esc($get('APP_VERSION', 'v1.0')) . "');\n"
+        . "define('APP_EDITION', '" . $esc($get('APP_EDITION', 'Remote')) . "');\n\n"
         . "define('API_KEY', '" . $esc($get('API_KEY')) . "');\n"
         . "define('ADMIN_KEY', '" . $esc($get('ADMIN_KEY', $get('API_KEY'))) . "');\n"
         . "define('BASIC_AUTH_USER', '" . $esc($get('BASIC_AUTH_USER')) . "');\n"
-        . "define('BASIC_AUTH_PASS', '" . $esc($get('BASIC_AUTH_PASS')) . "');\n";
-    $path = fuwari_secrets_path();
+        . "define('BASIC_AUTH_PASS', '" . $esc($get('BASIC_AUTH_PASS')) . "');\n\n"
+        . "define('TRUST_PROXY', {$trust});\n\n"
+        . $cors . "\n"
+        . "define('MAX_BODY_BYTES', {$max});\n";
+    $path = fuwari_config_path();
     $ok = file_put_contents($path, $body) !== false;
     if ($ok) {
         @chmod($path, 0600);
     }
     return $ok;
 }
+
 

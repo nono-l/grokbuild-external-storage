@@ -1,16 +1,14 @@
 # 2. PHP API — レガシーレンタルサーバー側
 
-このフォルダだけを **HTTPS 対応の古い共用サーバー**（PHP + MySQL）へ置きます。
+このフォルダを HTTPS + PHP + MySQL へ置く。
 
-Vercel には置きません。Hobby の枠の外です。
+設定の本体は **`api/config.php`**（php_installer と同じ）。  
+`install.php` が Sample を本番値で上書きする。ソースには本物を載せない。
 
 ```
 php-api/
-├── install.php     自己改名インストーラ
-├── setup.php       接続ログ / IP 許可 .htaccess（サーバ管理）
-├── api/proxy.php   Hobby コネクタが叩く JSON API
-├── apps/           アプリの顔（active.php）
-└── install/sql.sql
+├── install.php      → api/config.php を動的生成
+├── setup.php        → 同じ config.php を更新
+├── api/config.php   Sample（リポジトリ） / 本番（サーバ）
+└── api/proxy.php
 ```
-
-手順: アップロード → `install.php` → 表示された URL / キーを Hobby 管理画面に貼る。

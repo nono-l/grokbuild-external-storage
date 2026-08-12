@@ -105,15 +105,15 @@ if ($authed && $pdo) {
             $basicUser = trim((string)($_POST['basic_user'] ?? ''));
             $basicPass = (string)($_POST['basic_pass'] ?? '');
             $adminKeyNew = trim((string)($_POST['admin_key_new'] ?? ''));
-            if (fuwari_write_secrets([
+            if (fuwari_write_config([
                 'API_KEY' => $newKey,
                 'ADMIN_KEY' => $adminKeyNew !== '' ? $adminKeyNew : $newKey,
                 'BASIC_AUTH_USER' => $basicUser,
                 'BASIC_AUTH_PASS' => $basicPass,
             ])) {
-                $flash = ['type' => 'ok', 'msg' => 'secrets.local.php を更新しました（ソースには書きません）。新しい API キーを Hobby 管理画面へ。'];
+                $flash = ['type' => 'ok', 'msg' => 'config.php を更新しました（ソースではなくサーバ上の動的設定）。新しい API キーを Hobby 管理画面へ。'];
             } else {
-                $flash = ['type' => 'err', 'msg' => 'secrets.local.php を書けませんでした'];
+                $flash = ['type' => 'err', 'msg' => 'config.php を書けませんでした'];
             }
         }
 
@@ -283,9 +283,9 @@ function h(?string $s): string {
       </section>
 
       <section class="mb-6 rounded-3xl border border-emerald-700/40 bg-emerald-900/40 p-5">
-        <h2 class="font-semibold">接続秘密鍵（secrets.local.php）</h2>
+        <h2 class="font-semibold">接続秘密鍵（config.php）</h2>
         <p class="mt-1 text-xs text-emerald-200/60">
-          ソースには書きません。install / この画面が動的に生成します。
+          php_installer と同じく config.php に動的保存します。リポジトリの Sample は使いません。
         </p>
         <form method="post" class="mt-3 grid gap-2 sm:grid-cols-2">
           <input type="hidden" name="form" value="rotate_secrets" />
@@ -302,7 +302,7 @@ function h(?string $s): string {
             <input type="password" name="basic_pass" class="mt-1 w-full rounded-xl border border-emerald-700 bg-emerald-950/60 px-3 py-2 text-sm" placeholder="変更するときだけ" />
           </label>
           <div class="sm:col-span-2">
-            <button class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold">secrets.local.php を更新</button>
+            <button class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold">config.php を更新</button>
           </div>
         </form>
       </section>
