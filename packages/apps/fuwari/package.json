@@ -1,8 +1,8 @@
 {
-  "name": "@xstore/app-fuwari",
+  "name": "@grokbuild/app-fuwari",
   "version": "1.0.0",
   "private": true,
-  "description": "Fuwari REC adapter on @xstore/core-client",
+  "description": "Example app profile (Fuwari REC) on @grokbuild/external-storage",
   "type": "module",
   "exports": { ".": "./index.ts" },
   "license": "MIT"

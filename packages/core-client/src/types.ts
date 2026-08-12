@@ -49,7 +49,7 @@ export const DEFAULT_REMOTE_CONFIG: RemoteStoreConfig = {
 };
 
 export function configStorageKey(appId: string): string {
-  return `xstore.${appId}.remote-config.v1`;
+  return `grokbuild.${appId}.remote-config.v1`;
 }
 
 /** Compose the on-wire namespace. Idempotent if already prefixed. */

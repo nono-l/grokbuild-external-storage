@@ -6,7 +6,7 @@
 header('Content-Type: text/html; charset=utf-8');
 
 require_once __DIR__ . '/apps/load.php';
-$profile = xstore_profile();
+$profile = grokbuild_profile();
 
 $APP_ID      = $profile['id'];
 $APP_NAME    = $profile['name'];

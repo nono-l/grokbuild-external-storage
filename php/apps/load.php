@@ -4,7 +4,7 @@
  */
 declare(strict_types=1);
 
-function xstore_profile(): array {
+function grokbuild_profile(): array {
     static $cached = null;
     if (is_array($cached)) {
         return $cached;
@@ -25,7 +25,7 @@ function xstore_profile(): array {
     return $cached;
 }
 
-function xstore_profile_get(string $key, mixed $default = null): mixed {
-    $p = xstore_profile();
+function grokbuild_profile_get(string $key, mixed $default = null): mixed {
+    $p = grokbuild_profile();
     return $p[$key] ?? $default;
 }

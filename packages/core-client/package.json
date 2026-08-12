@@ -1,8 +1,8 @@
 {
-  "name": "@xstore/core-client",
+  "name": "@grokbuild/external-storage",
   "version": "1.0.0",
   "private": true,
-  "description": "App-agnostic browser client for the HTTPS MySQL proxy",
+  "description": "Grok Build — app-agnostic browser client for the HTTPS MySQL proxy",
   "type": "module",
   "exports": { ".": "./src/index.ts" },
   "license": "MIT"

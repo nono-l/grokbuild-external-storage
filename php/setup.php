@@ -9,7 +9,7 @@ declare(strict_types=1);
 session_start();
 require_once __DIR__ . '/api/bootstrap.php';
 require_once __DIR__ . '/apps/load.php';
-$profile = xstore_profile();
+$profile = grokbuild_profile();
 
 $flash = null;
 $error = null;
@@ -195,7 +195,7 @@ function h(?string $s): string {
   <div class="max-w-4xl mx-auto px-4 py-10">
     <header class="mb-8 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <p class="text-xs text-emerald-300/60"><?= h((string)$profile['id']) ?> · external store</p>
+        <p class="text-xs text-emerald-300/60"><?= h((string)$profile['id']) ?> · Grok Build External Storage</p>
         <h1 class="text-2xl font-bold tracking-tight">セットアップ & 接続監視</h1>
         <p class="mt-1 text-sm text-emerald-200/70">
           クライアントからの接続をログし、接続元 IP だけで <code class="text-emerald-200">proxy.php</code> を守る .htaccess を書けます。

@@ -6,7 +6,7 @@ import {
 
 export type ConfigStoreOptions = {
   appId: string;
-  /** Override localStorage key. Default: xstore.{appId}.remote-config.v1 */
+  /** Override localStorage key. Default: grokbuild.{appId}.remote-config.v1 */
   storageKey?: string;
 };
 

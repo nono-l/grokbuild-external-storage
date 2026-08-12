@@ -1,15 +1,15 @@
-# xstore — Vercel 外部ストレージ（共通骨格）
+# Grok Build External Storage
 
-Vercel などディスクのないフロントから、**ユーザーの MySQL** へ JSON だけ出すための共通構造です。
+Grok Build で作った **Vercel 上のアプリ** が、ユーザー自身の MySQL に JSON だけ出すための共通キットです。
 
-アプリ固有の型（Fuwari の MIX など）はコアに入れません。  
-**コア + アプリプロファイル** の二層です。
+特定アプリ（Fuwari など）専用ではありません。  
+**コア + アプリプロファイル** で、同じプロキシを何本の SPA からでも使えます。
 
 ```
-[ Any app on Vercel ]
+[ Grok Build app on Vercel ]
         │  POST JSON + X-Api-Key
         ▼
-[ php/api/proxy.php ]     ← 共通
+[ php/api/proxy.php ]     ← このリポジトリの共通コア
         │
         ▼
 [ MySQL kv / snapshots / log ]
@@ -25,7 +25,7 @@ Vercel などディスクのないフロントから、**ユーザーの MySQL**
 | **コア TS** | [`packages/core-client/`](packages/core-client/) | ping / kv / snap / ログ |
 | **アプリ TS** | [`packages/apps/{id}/`](packages/apps/) | そのアプリの設定 JSON 型 |
 
-Fuwari REC は **実装例** です（`php/apps/fuwari.php` + `packages/apps/fuwari`）。
+付属の `fuwari` は **プロファイルの実装例** です。別の Grok Build アプリは `php/apps/_template.php` から足します。
 
 ## ドキュメント
 
@@ -40,6 +40,6 @@ Fuwari REC は **実装例** です（`php/apps/fuwari.php` + `packages/apps/fuw
 1. `php/` を HTTPS ホストへ
 2. `php/apps/active.php` が欲しいアプリを指しているか確認
 3. `install.php` → クライアントに URL / API キー
-4. フロントは `createConfigStore({ appId: "fuwari" })`
+4. フロントは `createConfigStore({ appId: "your-app" })`
 
 同じ MySQL に別アプリを足すときはプロファイルを追加するだけ。テーブルは増やしません。
