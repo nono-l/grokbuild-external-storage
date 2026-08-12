@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fuwari REC Remote</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-emerald-950 text-emerald-50 min-h-screen grid place-items-center p-6">
+  <div class="max-w-lg w-full rounded-3xl border border-emerald-700/50 bg-emerald-900/60 p-8 shadow-xl">
+    <h1 class="text-xl font-bold">Fuwari REC Remote</h1>
+    <p class="mt-2 text-sm text-emerald-200/70 leading-relaxed">
+      HTTPS MySQL プロキシ（php_installer 互換）。接続ログと IP 制限は setup から。
+    </p>
+    <ul class="mt-4 space-y-2 text-sm">
+      <li><a class="text-emerald-300 underline" href="install.php">install.php</a> — 初回 DB セットアップ</li>
+      <li><a class="text-emerald-300 underline font-semibold" href="setup.php">setup.php</a> — 接続監視・IP 許可 .htaccess</li>
+      <li><code class="text-emerald-200">api/proxy.php</code> — JSON API（Fuwari から POST）</li>
+      <li><a class="text-emerald-300 underline" href="dlzip.php">dlzip.php</a> — 秘密マスク付き ZIP</li>
+    </ul>
+    <p class="mt-6 text-[11px] text-emerald-200/50">
+      流れ: install → Fuwari で接続テスト → setup で IP 確認 → 許可リスト → .htaccess 書込
+    </p>
+  </div>
+</body>
+</html>

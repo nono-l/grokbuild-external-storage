@@ -1,0 +1,11 @@
+# never commit real credentials
+php/api/.ip_enforce
+php/install.php.txt
+
+# local noise
+.DS_Store
+node_modules/
+dist/
+*.log
+.env
+.env.*
