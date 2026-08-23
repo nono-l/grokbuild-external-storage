@@ -1,0 +1,9 @@
+{
+  "name": "@grokbuild/app-tmw",
+  "version": "1.0.0",
+  "private": true,
+  "description": "App profile (TMW family) on @grokbuild/external-storage",
+  "type": "module",
+  "exports": { ".": "./index.ts" },
+  "license": "MIT"
+}
