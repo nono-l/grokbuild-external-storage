@@ -82,15 +82,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             return str_replace(["\\", "'"], ["\\\\", "\\'"], $s);
                         };
 
-                        // Preserve CORS if already customized in existing config
-                        $corsBlock = <<<'PHP'
-define('CORS_ORIGINS', [
-    'https://fuwa.pachimanzi.uk',
-    'https://fuwa-rec.grok.me',
-    'http://localhost:8080',
-    'http://127.0.0.1:8080',
-]);
-PHP;
+                        // CORS comes from the active app profile (apps/active.php)
+                        $corsOrigins = $profile['cors'] ?? [];
+                        if (!is_array($corsOrigins) || $corsOrigins === []) {
+                            $corsOrigins = ['http://localhost:8080'];
+                        }
+                        $corsLines = [];
+                        foreach ($corsOrigins as $origin) {
+                            if (!is_string($origin) || $origin === '') continue;
+                            $corsLines[] = "    '" . $esc($origin) . "',";
+                        }
+                        $corsBlock = "define('CORS_ORIGINS', [\n" . implode("\n", $corsLines) . "\n]);\n";
 
                         $config_content = <<<PHP
 <?php
