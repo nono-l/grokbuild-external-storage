@@ -15,9 +15,13 @@
       <code class="text-emerald-200">apps/active.php</code>、
       データは <code class="text-emerald-200">{appId}.{tenant}</code> で分かれます。
     </p>
+    <p class="mt-3 text-sm text-emerald-200/80 leading-relaxed">
+      <code class="text-emerald-100">install.php</code> は OS のインストールメディア相当（API サーバー初期化）。
+      <code class="text-emerald-100">setup.php</code> は入れた OS をどう使うかの運用設定です。
+    </p>
     <ul class="mt-4 space-y-2 text-sm">
-      <li><a class="text-emerald-300 underline" href="install.php">install.php</a> — 初回 DB</li>
-      <li><a class="text-emerald-300 underline font-semibold" href="setup.php">setup.php</a> — 接続監視・IP</li>
+      <li><a class="text-emerald-300 underline font-semibold" href="install.php">install.php</a> — インストールメディア（DB・APIキー）</li>
+      <li><a class="text-emerald-300 underline" href="setup.php">setup.php</a> — 運用設定（接続後の IP・ログ）</li>
       <li><code class="text-emerald-200">api/proxy.php</code> — JSON API</li>
       <li><a class="text-emerald-300 underline" href="dlzip.php">dlzip.php</a> — 秘密マスク ZIP</li>
     </ul>

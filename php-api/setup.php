@@ -1,7 +1,9 @@
 <?php
 /**
- * Fuwari REC Remote — セットアップ / 接続監視 / IP 許可 .htaccess 生成
+ * 運用設定 — インストール済み API サーバーを外部接続でどう使うか
+ * 接続ログ / IP 許可 / .htaccess
  *
+ * install.php が OS インストールメディアなら、ここは入れた OS の設定。
  * ログイン: config.php の ADMIN_KEY（未設定なら API_KEY）
  */
 declare(strict_types=1);
@@ -211,7 +213,7 @@ function h(?string $s): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><?= h($appName) ?> — セットアップ</title>
+  <title><?= h($appName) ?> — 運用設定</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -220,9 +222,10 @@ function h(?string $s): string {
     <header class="mb-8 flex flex-wrap items-end justify-between gap-3">
       <div>
         <p class="text-xs text-emerald-300/60"><?= h((string)$profile['id']) ?> · Grok Build External Storage</p>
-        <h1 class="text-2xl font-bold tracking-tight">セットアップ & 接続監視</h1>
+        <h1 class="text-2xl font-bold tracking-tight">運用設定</h1>
         <p class="mt-1 text-sm text-emerald-200/70">
-          クライアントからの接続をログし、接続元 IP だけで <code class="text-emerald-200">proxy.php</code> を守る .htaccess を書けます。
+          インストール済みの API サーバーを、外部接続でどう使うか。
+          接続ログと接続元 IP で <code class="text-emerald-200">proxy.php</code> を守る .htaccess を書けます。
         </p>
       </div>
       <?php if ($authed): ?>

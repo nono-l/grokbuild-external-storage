@@ -1,6 +1,8 @@
 <?php
 // =============================================
-// Fuwari REC Remote — Database Installer (Self-Destructing)
+// API サーバー初期設定（インストールメディア）
+// DB 接続・テーブル・API キーを api/config.php に書く。完了後は改名される。
+// 使い方（IP・ログ・外部接続）は setup.php。
 // Based on php_installer by https://x.com/mss_0337_2024
 // =============================================
 header('Content-Type: text/html; charset=utf-8');
@@ -164,10 +166,13 @@ PHP;
                     <i class="fa-solid fa-cloud-arrow-up text-white text-3xl"></i>
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight"><?= htmlspecialchars($APP_NAME) ?></h1>
-                <p class="text-emerald-200/70 mt-1 text-sm">MySQL リモートプロキシ・インストーラ</p>
+                <p class="text-emerald-200/70 mt-1 text-sm">API サーバー初期設定 · インストールメディア</p>
+                <p class="mt-2 text-xs text-emerald-200/50 leading-relaxed">
+                    DB 接続と API キーだけを書きます。外部接続の細かい設定は、完了後の setup.php です。
+                </p>
                 <div class="inline-flex items-center gap-x-2 mt-3 px-3 py-1 bg-emerald-950/60 rounded-full text-xs text-emerald-200/80">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                    <span>Self-Destructing · php_installer 互換</span>
+                    <span>インストールメディア · 完了後に改名</span>
                 </div>
             </div>
 
@@ -199,7 +204,7 @@ PHP;
                     <p class="text-[11px] text-emerald-200/60">
                         install.php は install.php.txt に改名済みです。CORS にフロントの Origin を足す場合は config.php を編集してください。
                     </p>
-                    <a href="setup.php" class="block text-center mt-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white">接続監視セットアップを開く</a>
+                    <a href="setup.php" class="block text-center mt-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white">運用設定（setup.php）を開く</a>
                     <a href="index.html" class="block text-center mt-2 text-emerald-300 underline text-sm">ステータスページへ</a>
                 </div>
             <?php else: ?>
