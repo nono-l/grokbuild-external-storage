@@ -1,10 +1,12 @@
 # Packages
 
-| Package | Kind | Path |
-|---------|------|------|
-| [`@grokbuild/external-storage-connector`](../vercel-hobby/connector) | JS (Hobby) | `vercel-hobby/connector` |
-| [`@grokbuild/app-fuwari`](../vercel-hobby/apps/fuwari) | JS profile | `vercel-hobby/apps/fuwari` |
-| [`@grokbuild/app-tmw`](../vercel-hobby/apps/tmw) | JS profile | `vercel-hobby/apps/tmw` |
-| [`@nono-l/grokbuild-php-api`](../php-api) | PHP on rental | `php-api` |
+Hobby 側の JS コネクタと、レンタルへ置く PHP。PHP は Composer / npm に出さない。
 
-PHP は GitHub Packages（npm スコープ `@nono-l`）と Composer 名 `nono-l/grokbuild-php-api`。
+| 名前 | 何 | 置き場 |
+|------|----|--------|
+| `@grokbuild/external-storage-connector` | Hobby が PHP を叩く JS | [`vercel-hobby/connector`](../vercel-hobby/connector) |
+| `@grokbuild/app-fuwari` | Fuwari の顔 | [`vercel-hobby/apps/fuwari`](../vercel-hobby/apps/fuwari) |
+| `@grokbuild/app-tmw` | TMW の顔 | [`vercel-hobby/apps/tmw`](../vercel-hobby/apps/tmw) |
+| **php-api** | レンタルへフォルダごと置く | [`../php-api`](../php-api) |
+
+php-api は ZIP かフォルダコピー。`install.php` が初期化、`setup.php` が運用。
